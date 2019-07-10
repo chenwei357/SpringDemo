@@ -153,4 +153,27 @@ public class UserServiceImpl implements UserService {
         }
         System.out.println(1/0);
     }
+
+    @Transactional(propagation = Propagation.REQUIRED)
+    public void doWithIsolation() {
+        System.out.println("方法doWithIsolation存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法doWithIsolation事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        System.out.println("方法doWithIsolation事务隔离级别：" + TransactionSynchronizationManager.getCurrentTransactionIsolationLevel());
+        User user = new User();
+        user.setUser_name("doWithIsolation");
+        user.setUser_pwd("123456");
+        userDao.insert(user);
+        //personService.findByName("doWithIsolation");
+        this.findByName("doWithIsolation");
+        System.out.println(1/0);
+    }
+
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void findByName(String name) {
+        System.out.println("方法UserServiceImpl#findByName存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法UserServiceImpl#findByName事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        System.out.println("方法UserServiceImpl#findByName事务隔离级别：" + TransactionSynchronizationManager.getCurrentTransactionIsolationLevel());
+        User user = userDao.findByName(name);
+        System.out.println(user);
+    }
 }

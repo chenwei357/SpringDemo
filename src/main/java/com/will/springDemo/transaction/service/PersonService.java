@@ -8,6 +8,6 @@ public interface PersonService {
 
     void update();
 
-    void find(int id);
+    void findByName(String name);
 
 }

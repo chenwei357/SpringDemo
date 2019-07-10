@@ -49,7 +49,8 @@ public class TransactionTest {
     public void testTX() {
         AnnotationConfigApplicationContext context = new AnnotationConfigApplicationContext(Config.class);
         UserService userService = context.getBean(UserService.class);
-        userService.doWithPropagation();
+        //userService.doWithPropagation();
+        userService.doWithIsolation();
         //userService.doWithTXE();
         context.close();
     }

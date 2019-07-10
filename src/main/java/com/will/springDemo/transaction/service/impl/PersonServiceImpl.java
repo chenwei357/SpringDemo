@@ -5,6 +5,8 @@ import com.will.springDemo.transaction.entity.User;
 import com.will.springDemo.transaction.service.PersonService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 
@@ -43,7 +45,12 @@ public class PersonServiceImpl implements PersonService {
     }
 
     @Override
-    public void find(int id) {
-
+    @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_UNCOMMITTED)
+    public void findByName(String name) {
+        System.out.println("方法findByName存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法findByName事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        System.out.println("方法findByName事务隔离级别：" + TransactionSynchronizationManager.getCurrentTransactionIsolationLevel());
+        User user = userDao.findByName(name);
+        System.out.println(user);
     }
 }

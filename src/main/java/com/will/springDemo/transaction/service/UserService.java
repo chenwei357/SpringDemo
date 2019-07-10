@@ -8,4 +8,18 @@ public interface UserService {
     void update();
 
     void find(int id);
+
+    void doWithTXA();
+
+    void doWithTXB();
+
+    void doWithTXC();
+
+    void doWithTXD();
+
+    void doWithTXE();
+
+    void doWithTXF();
+
+    void doWithPropagation();
 }

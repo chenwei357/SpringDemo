@@ -2,13 +2,13 @@ package com.will.springDemo.transaction.service.impl;
 
 import com.will.springDemo.transaction.dao.UserDao;
 import com.will.springDemo.transaction.entity.User;
+import com.will.springDemo.transaction.service.PersonService;
 import com.will.springDemo.transaction.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.TransactionStatus;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionCallback;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 
 /**
@@ -22,6 +22,8 @@ public class UserServiceImpl implements UserService {
     private UserDao userDao;
     @Autowired
     private TransactionTemplate transactionTemplate;
+    @Autowired
+    private PersonService personService;
 
     /**
      * 声明式事务
@@ -59,4 +61,96 @@ public class UserServiceImpl implements UserService {
         System.out.println("==========查找用户==========");
     }
 
+    //====================情景1代码========================
+    public void doWithTXA() {
+        System.out.println("方法doWithTXA存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        User user = new User();
+        user.setUser_name("TxA");
+        user.setUser_pwd("123456");
+        System.out.println("-------------doWithTXA--------------");
+        userDao.insert(user);
+        doWithTXB();
+    }
+
+    @Transactional
+    public void doWithTXB() {
+        System.out.println("方法doWithTXB存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法doWithTXB事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        User user = new User();
+        user.setUser_name("TxB");
+        user.setUser_pwd("123456");
+        System.out.println("-------------doWithTXB--------------");
+        userDao.insert(user);
+        System.out.println(1/0);
+    }
+
+    //====================情景1代码========================
+
+    //====================情景2代码========================
+    @Transactional
+    public void doWithTXC() {
+        System.out.println("方法doWithTXC存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法doWithTXC事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        User user = new User();
+        user.setUser_name("TxC");
+        user.setUser_pwd("123456");
+        System.out.println("-------------doWithTXC--------------");
+        userDao.insert(user);
+        doWithTXD();
+    }
+
+    public void doWithTXD() {
+        System.out.println("方法doWithTXD存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法doWithTXD事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        User user = new User();
+        user.setUser_name("TxD");
+        user.setUser_pwd("123456");
+        System.out.println("-------------doWithTXD--------------");
+        userDao.insert(user);
+        System.out.println(1/0);
+    }
+    //====================情景2代码========================
+
+    //====================情景3代码========================
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void doWithTXE() {
+        System.out.println("方法doWithTXE存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法doWithTXE事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        User user = new User();
+        user.setUser_name("TxE");
+        user.setUser_pwd("123456");
+        System.out.println("-------------doWithTXE--------------");
+        userDao.insert(user);
+        doWithTXF();
+    }
+
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void doWithTXF() {
+        System.out.println("方法doWithTXF存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法doWithTXF事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        User user = new User();
+        user.setUser_name("TxF");
+        user.setUser_pwd("123456");
+        System.out.println("-------------doWithTXF--------------");
+        userDao.insert(user);
+        System.out.println(1/0);
+    }
+    //====================情景3代码========================
+
+    @Transactional
+    public void doWithPropagation() {
+        System.out.println("方法doWithPropagation存在事务：" + TransactionSynchronizationManager.isActualTransactionActive());
+        System.out.println("方法doWithPropagation事务名称：" + TransactionSynchronizationManager.getCurrentTransactionName());
+        User user = new User();
+        user.setUser_name("doWithPropagation");
+        user.setUser_pwd("123456");
+        userDao.insert(user);
+        //调用业务方法B
+        try {
+            personService.insert();
+        } catch (Exception e) {
+            System.out.println("业务方法B发生异常,此处可以调用C方法");
+        }
+        System.out.println(1/0);
+    }
 }
